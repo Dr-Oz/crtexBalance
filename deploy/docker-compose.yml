@@ -27,6 +27,19 @@ services:
     restart: always
     ports:
       - 8080:8080
+  rabbitmq:
+    image: rabbitmq:3.8.9-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: on-failure
+    logging:
+      options:
+        max-size: "30m"
+        max-file: "3"
 
 volumes:
   dbdata:
+  rabbitmq_data:  # Добавьте это

@@ -6,6 +6,7 @@ import (
 	"crtexBalance/internal/handler"
 	"crtexBalance/internal/repository"
 	"crtexBalance/internal/service"
+	"crtexBalance/mq"
 	"database/sql"
 	"flag"
 	"log"
@@ -57,12 +58,30 @@ func main() {
 		return
 	}
 
+	// Initialize RabbitMQ
+	rabbitmq, err := mq.NewRabbitMQ("amqp://guest:guest@localhost:5672/")
+	if err != nil {
+		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+	}
+	defer rabbitmq.Close()
+
 	repos := repository.NewRepository(db)
-	services = service.NewService(repos, conf, db)
+	services = service.NewService(repos, conf, db, rabbitmq)
 	handlers := handler.NewHandler(services)
 
 	server := new(Server)
 	server.conf = conf
+
+	replenishmentConsumer, err := mq.NewReplenishmentConsumer("amqp://guest:guest@localhost:5672/") // Update with your RabbitMQ URL
+	if err != nil {
+		log.Fatalf("Failed to create replenishment consumer: %v", err)
+	}
+
+	go func() {
+		if err := replenishmentConsumer.Consume(); err != nil {
+			log.Fatalf("Failed to consume replenishment messages: %v", err)
+		}
+	}()
 
 	go func() {
 		if err := server.Run(conf.Port, handlers.Init()); err != nil {

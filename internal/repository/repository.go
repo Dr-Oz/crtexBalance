@@ -6,8 +6,6 @@ import (
 	"time"
 )
 
-//go:generate mockgen -source=repository.go -destination=mocks/mock.go
-
 type Repository struct {
 	Control
 }

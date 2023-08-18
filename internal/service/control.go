@@ -4,9 +4,11 @@ import (
 	c "crtexBalance/internal/config"
 	"crtexBalance/internal/models"
 	"crtexBalance/internal/repository"
+	"crtexBalance/mq"
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/mailru/easyjson"
 	"time"
 )
 
@@ -16,13 +18,15 @@ type ControlService struct {
 	repo repository.Control
 	conf *c.Config
 	db   *sql.DB
+	rmq  *mq.RabbitMQ // Добавьте это поле
 }
 
-func NewControlService(repo repository.Control, conf *c.Config, db *sql.DB) *ControlService {
+func NewControlService(repo repository.Control, conf *c.Config, db *sql.DB, rmq *mq.RabbitMQ) *ControlService {
 	return &ControlService{
 		repo: repo,
 		conf: conf,
 		db:   db,
+		rmq:  rmq,
 	}
 }
 
@@ -139,4 +143,13 @@ func (c *ControlService) Transfer(money *models.Money) error {
 	}
 
 	return tx.Commit()
+}
+
+func (c *ControlService) PublishReplenishment(replenishment *models.Replenishment) error {
+	body, err := easyjson.Marshal(replenishment)
+	if err != nil {
+		return err
+	}
+
+	return c.rmq.Publish("replenishment", body)
 }

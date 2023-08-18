@@ -79,6 +79,11 @@ func (h *Handler) replenishmentBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err = h.services.PublishReplenishment(&replenishment); err != nil {
+		Error(err, w, http.StatusInternalServerError)
+		return
+	}
+
 	response := &models.Response{
 		Message: "баланс пополнен",
 	}
@@ -88,6 +93,7 @@ func (h *Handler) replenishmentBalance(w http.ResponseWriter, r *http.Request) {
 		Error(err, w, http.StatusInternalServerError)
 		return
 	}
+
 }
 
 // @Summary Money transfer
