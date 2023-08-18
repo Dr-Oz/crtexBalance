@@ -74,4 +74,8 @@
 ***
 
 ## Swagger-документация
+<<<<<<< HEAD
 По адресу ``http://localhost:8081/swagger/index.html`` доступна swagger-документация
+=======
+ По адресу ``http://localhost:8081/swagger/index.html`` доступна swagger-документация
+>>>>>>> 786f454ed7e2d760a40e11b05594bd26fa43aa9d
