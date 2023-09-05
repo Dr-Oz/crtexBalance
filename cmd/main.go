@@ -59,7 +59,7 @@ func main() {
 	}
 
 	// Initialize RabbitMQ
-	rabbitmq, err := mq.NewRabbitMQ("amqp://guest:guest@localhost:5672/")
+	rabbitmq, err := mq.NewRabbitMQ("amqp://guest:guest@rabbitmq:5672/")
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
 	}
@@ -72,7 +72,7 @@ func main() {
 	server := new(Server)
 	server.conf = conf
 
-	replenishmentConsumer, err := mq.NewReplenishmentConsumer("amqp://guest:guest@localhost:5672/") // Update with your RabbitMQ URL
+	replenishmentConsumer, err := mq.NewReplenishmentConsumer("amqp://guest:guest@rabbitmq:5672/") // Update with your RabbitMQ URL
 	if err != nil {
 		log.Fatalf("Failed to create replenishment consumer: %v", err)
 	}
